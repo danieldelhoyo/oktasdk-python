@@ -49,6 +49,7 @@ class UsersClient(ApiClient):
         :type user: User
         :rtype: User
         """
+
         return self.update_user_by_id(user.id, user)
 
     def update_user_by_id(self, uid, user):
@@ -56,11 +57,16 @@ class UsersClient(ApiClient):
 
         :param uid: the target user id
         :type uid: str
-        :param user: the data to update the target user
+        :param params: the data to update the target user
         :type user: User
         :rtype: User
         """
-        response = ApiClient.put_path(self, '/{0}'.format(uid), user)
+
+        params = {
+            'profile' : user.profile,
+            'credentials' : user.credentials
+        }
+        response = ApiClient.put_path(self, '/{0}'.format(uid), params)
         return Utils.deserialize(response.text, User)
 
     def create_user(self, user, activate=False):
@@ -139,6 +145,26 @@ class UsersClient(ApiClient):
         response = ApiClient.post_path(self, '/{0}/lifecycle/deactivate'.format(uid))
         return Utils.deserialize(response.text, User)
 
+    def suspend_user(self, uid):
+        """Suspend user by target id
+
+        :param uid: the target user id
+        :type uid: str
+        :return: User
+        """
+        response = ApiClient.post_path(self, '/{0}/lifecycle/suspend'.format(uid))
+        return Utils.deserialize(response.text, User)
+
+    def unsuspend_user(self, uid):
+        """Unsuspend user by target id
+
+        :param uid: the target user id
+        :type uid: str
+        :return: User
+        """
+        response = ApiClient.post_path(self, '/{0}/lifecycle/unsuspend'.format(uid))
+        return Utils.deserialize(response.text, User)
+
     def unlock_user(self, uid):
         """Unlock user by target id
 
@@ -203,3 +229,13 @@ class UsersClient(ApiClient):
             }
             response = ApiClient.post_path(self, '/{0}/lifecycle/expire_password'.format(uid), params=params)
             return Utils.deserialize(response.text, TempPassword)
+
+    def reset_factors(self, uid):
+        """Reset all user factors by target id
+
+        :param uid: the target user id
+        :type uid: str
+        :return: None
+        """
+        response = ApiClient.post_path(self, '/{0}/lifecycle/reset_factors'.format(uid))
+        return Utils.deserialize(response.text, User)
