@@ -49,7 +49,6 @@ class UsersClient(ApiClient):
         :type user: User
         :rtype: User
         """
-
         return self.update_user_by_id(user.id, user)
 
     def update_user_by_id(self, uid, user):
@@ -57,11 +56,10 @@ class UsersClient(ApiClient):
 
         :param uid: the target user id
         :type uid: str
-        :param params: the data to update the target user
+        :param user: the data to update the target user
         :type user: User
         :rtype: User
         """
-
         params = {
             'profile' : user.profile,
             'credentials' : user.credentials
@@ -112,7 +110,6 @@ class UsersClient(ApiClient):
         """
         if url:
             response = ApiClient.get(self, url)
-
         else:
             params = {
                 'limit': limit,
@@ -120,7 +117,6 @@ class UsersClient(ApiClient):
                 'filter': filter_string
             }
             response = ApiClient.get_path(self, '/', params=params)
-
         return PagedResults(response, User)
 
     # LIFECYCLE
@@ -222,13 +218,13 @@ class UsersClient(ApiClient):
         :return: None or TempPassword
         """
         if not temp_password:
-            ApiClient.post_path(self, '/{0}/lifecycle/expire_password'.format(uid))
+            response = ApiClient.post_path(self, '/{0}/lifecycle/expire_password'.format(uid))
         else:
             params = {
                 'tempPassword': temp_password
             }
             response = ApiClient.post_path(self, '/{0}/lifecycle/expire_password'.format(uid), params=params)
-            return Utils.deserialize(response.text, TempPassword)
+        return Utils.deserialize(response.text, TempPassword)
 
     def reset_factors(self, uid):
         """Reset all user factors by target id
